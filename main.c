@@ -396,30 +396,44 @@ void game_frame()
     // move camera to arrow keys (or d-pad):
     const float delta = 0.1;
     int need_new_view = 0;
-    if (GAMEPAD_PRESSED(0, left)) 
+    if (GAMEPAD_PRESSED(0, select))
     {
-        for (int i=0; i<3; ++i)
-            camera.viewer[i] -= delta*camera.right[i];
+        camera = (Camera) {
+            .viewer = {0,0,(-1+2*whose_turn)*CAMERA_DISTANCE},
+            .viewee = {0,0,0},
+            .down = {0,1,0},
+            .magnification = CAMERA_MAGNIFICATION
+        };
         need_new_view = 1;
     }
-    else if (GAMEPAD_PRESSED(0, right)) 
+    else
     {
-        for (int i=0; i<3; ++i)
-            camera.viewer[i] += delta*camera.right[i];
-        need_new_view = 1;
+        if (GAMEPAD_PRESSED(0, left)) 
+        {
+            for (int i=0; i<3; ++i)
+                camera.viewer[i] -= delta*camera.right[i];
+            need_new_view = 1;
+        }
+        else if (GAMEPAD_PRESSED(0, right)) 
+        {
+            for (int i=0; i<3; ++i)
+                camera.viewer[i] += delta*camera.right[i];
+            need_new_view = 1;
+        }
+        if (GAMEPAD_PRESSED(0, down))
+        {
+            for (int i=0; i<3; ++i)
+                camera.viewer[i] += delta*camera.down[i];
+            need_new_view = 1;
+        }
+        else if (GAMEPAD_PRESSED(0, up))
+        {
+            for (int i=0; i<3; ++i)
+                camera.viewer[i] -= delta*camera.down[i];
+            need_new_view = 1;
+        }
     }
-    if (GAMEPAD_PRESSED(0, down))
-    {
-        for (int i=0; i<3; ++i)
-            camera.viewer[i] += delta*camera.down[i];
-        need_new_view = 1;
-    }
-    else if (GAMEPAD_PRESSED(0, up))
-    {
-        for (int i=0; i<3; ++i)
-            camera.viewer[i] -= delta*camera.down[i];
-        need_new_view = 1;
-    }
+
     if (need_new_view)
     {
         // fix the camera at four units away from the origin
